@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Weather Results</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <h1>Weather Results</h1>
+  </header>
+
+  <main>
+    {% if weather.error %}
+      <p class="error">{{ weather.error }}</p>
+    {% else %}
+      <div class="weather-container">
+        <h2>{{ weather.city }}</h2>
+        <img src="{{ url_for('static', filename='icons/' + weather.svg_icon) }}" alt="Weather icon" class="animated-icon">
+        <p><strong>Temperature:</strong> {{ weather.temperature_celsius }} °C</p>
+        <p><strong>Humidity:</strong> {{ weather.humidity }}%</p>
+        <p><strong>Description:</strong> {{ weather.description }}</p>
+      </div>
+    {% endif %}
+    <br />
+    <a href="/"><button>Check Another City</button></a>
+  </main>
+</body>
+</html>
+</body>
+</html>
