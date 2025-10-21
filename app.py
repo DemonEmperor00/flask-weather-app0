@@ -1,10 +1,14 @@
 from flask import Flask, render_template, request
+from dotenv import load_dotenv
 import requests
-
+import os
 app = Flask(__name__)
-API_KEY = "ae9d892d339e5d9da64b19b7a4254bc7"
+
+load_dotenv()
+API_KEY = os.environ.get('WEATHER_API_KEY')
 
 def map_svg_icon(description):
+
     desc = description.lower()
     if "clear" in desc:
         return "clear-day.svg"
@@ -20,11 +24,10 @@ def map_svg_icon(description):
         return "mist.svg"
     else:
         return "cloudy.svg"
-
+    
 def get_weather(city):
-    BASE_URL = "https://api.openweathermap.org/data/2.5/weather"
+    BASE_URL = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}"
     params = {"q": city, "appid": API_KEY}
-
     try:
         response = requests.get(BASE_URL, params=params, timeout=10)
         response.raise_for_status()
@@ -54,7 +57,7 @@ def get_weather(city):
     except requests.exceptions.RequestException as e:
         print(f"Request error: {e}")
         return {"error": "Network error occurred"}
-
+    
 @app.route('/', methods=['GET', 'POST'])
 def home():
     if request.method == 'POST':
