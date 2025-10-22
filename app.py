@@ -15,9 +15,9 @@ def map_svg_icon(description):
     elif "cloud" in desc:
         return "cloudy.svg"
     elif "rain" in desc:
-        return "rainy-1.svg"
+        return "rain.svg"
     elif "snow" in desc:
-        return "snowy-1.svg"
+        return "snow.svg"
     elif "thunder" in desc:
         return "thunder.svg"
     elif "mist" in desc or "fog" in desc or "haze" in desc:
