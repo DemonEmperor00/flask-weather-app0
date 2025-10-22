@@ -7,23 +7,36 @@ app = Flask(__name__)
 load_dotenv()
 API_KEY = os.environ.get('WEATHER_API_KEY')
 
-def map_svg_icon(description):
-
+def map_svg_icon(description, icon_code):
     desc = description.lower()
+    is_night = icon_code.endswith('n')
+    
     if "clear" in desc:
-        return "clear-day.svg"
+        return "clear-night.svg" if is_night else "clear-day.svg"
+    elif "overcast cloud" in desc:
+        return "overcast-night.svg" if is_night else "overcast-day.svg"
     elif "cloud" in desc:
-        return "cloudy.svg"
+        return "cloudy.svg" if is_night else "cloudy.svg"
+    elif "drizzle" in desc:
+        return "drizzle.svg" if is_night else "drizzle.svg"
+    elif "heavy intensity rain" in desc:
+        return "extreme-night-rain.svg" if is_night else "extreme-day-rain.svg"
     elif "rain" in desc:
-        return "rain.svg"
+        return "rain.svg" if is_night else "rain.svg"
     elif "snow" in desc:
-        return "snow.svg"
+        return "snow.svg" if is_night else "snow.svg"
     elif "thunder" in desc:
-        return "thunder.svg"
-    elif "mist" in desc or "fog" in desc or "haze" in desc:
-        return "mist.svg"
+        return "thunderstorms-night.svg" if is_night else "thunderstorms-day.svg"
+    elif "fog" in desc:
+        return "fog-night.svg" if is_night else "fog.svg"
+    elif "haze" in desc:
+        return "haze-night.svg" if is_night else "haze-day.svg"
+    elif "mist" in desc:
+        return "mist.svg" if is_night else "mist.svg"
+    elif "wind" in desc:
+        return "wind.svg" if is_night else "wind.svg"
     else:
-        return "cloudy.svg"
+        return "cloudy.svg" if is_night else "cloudy.svg"
     
 def get_weather(city):
     BASE_URL = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}"
@@ -42,7 +55,7 @@ def get_weather(city):
             humidity = main.get("humidity")
             description = weather.get("description", "").capitalize()
             icon_code = weather.get("icon", "")
-            svg_icon = map_svg_icon(description)
+            svg_icon = map_svg_icon(description, icon_code)
 
             return {
                 "city": data.get("name"),
