@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Weather Results</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="{{ weather.background_class }}">
 
@@ -23,7 +24,67 @@
         <p><strong>Humidity:</strong> {{ weather.humidity }}%</p>
         <p><strong>Description:</strong> {{ weather.description }}</p>
       </div>
+
+      {% if weather.hourly_forecast %}
+        <div class="chart-container">
+          <h3>Hourly Forecast</h3>
+          <canvas id="hourlyChart" width="400" height="200"></canvas>
+        </div>
+
+        <script>
+            const labels = {{ weather.hourly_forecast | map(attribute='time') | list | tojson | safe }};
+            const temps = {{ weather.hourly_forecast | map(attribute='temp') | list | tojson | safe }};
+            const icons = {{ weather.hourly_forecast | map(attribute='icon') | list | tojson | safe }}; // Add this to your Python logic
+
+            const iconImages = icons.map(src => {
+            const img = new Image();
+            img.src = `/static/icons/${src}`;
+            return img;
+      });
+
+            const iconPlugin = {
+            id: 'iconOverlay',
+            afterDatasetsDraw(chart) {
+            const ctx = chart.ctx;
+            chart.data.datasets[0].data.forEach((value, index) => {
+            const meta = chart.getDatasetMeta(0);
+            const x = meta.data[index].x;
+            const y = meta.data[index].y;
+            const icon = iconImages[index];
+            ctx.drawImage(icon, x - 12, y - 32, 24, 24);
+      });
+    }
+  };
+
+            const ctx = document.getElementById('hourlyChart').getContext('2d');
+            new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels: labels,
+            datasets: [{
+              label: 'Temperature (°C)',
+              data: temps,
+              borderColor: '#457b9d',
+              backgroundColor: 'rgba(69, 123, 157, 0.2)',
+              fill: true,
+              tension: 0.4,
+              pointRadius: 4,
+              pointHoverRadius: 6
+      }]
+    },
+            options: {
+            responsive: true,
+            plugins: {
+            legend: { display: false }
+      }
+    },
+            plugins: [iconPlugin]
+  });
+        </script>
+
+      {% endif %}
     {% endif %}
+
     <br />
     <a href="/"><button>Check Another City</button></a>
   </main>

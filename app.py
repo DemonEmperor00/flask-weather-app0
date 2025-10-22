@@ -1,78 +1,97 @@
 from flask import Flask, render_template, request
-from dotenv import load_dotenv
 import requests
 import os
-app = Flask(__name__)
+from dotenv import load_dotenv
 
+app = Flask(__name__)
 load_dotenv()
-API_KEY = os.environ.get('WEATHER_API_KEY')
+API_KEY = os.getenv("WEATHER_API_KEY")
 
 def map_svg_icon(description, icon_code):
     desc = description.lower()
     is_night = icon_code.endswith('n')
     variant = "night" if is_night else "day"
-    
+
     if "clear" in desc:
-        return "clear-" + variant + ".svg", f"clear-{variant}"
-    elif "overcast cloud" in desc:
-        return "overcast-" + variant + ".svg", f"overcast-{variant}"
+        return f"clear-{variant}.svg", f"clear-{variant}"
+    elif "overcast" in desc:
+        return f"overcast-{variant}.svg", f"overcast-{variant}"
     elif "cloud" in desc:
-        return "cloudy-" + variant + ".svg", f"cloudy-{variant}"
+        return f"cloudy-{variant}.svg", f"cloudy-{variant}"
     elif "drizzle" in desc:
-        return "drizzle-" + variant + ".svg", f"drizzle-{variant}"
+        return f"drizzle-{variant}.svg", f"drizzle-{variant}"
     elif "heavy intensity rain" in desc:
-        return "extreme-" + variant + "-rain.svg", f"extreme-{variant}-rain"
+        return f"extreme-{variant}-rain.svg", f"extreme-{variant}-rain"
     elif "rain" in desc:
-        return "rain-" + variant + ".svg", f"rain-{variant}"
+        return f"rain-{variant}.svg", f"rain-{variant}"
     elif "snow" in desc:
-        return "snow-" + variant + ".svg", f"snow-{variant}"
+        return f"snow-{variant}.svg", f"snow-{variant}"
     elif "thunder" in desc:
-        return "thunderstorms-" + variant + ".svg", f"thunderstorms-{variant}"
+        return f"thunderstorms-{variant}.svg", f"thunderstorms-{variant}"
     elif "fog" in desc:
-        return "fog-" + variant + ".svg", f"fog-{variant}"
+        return f"fog-{variant}.svg", f"fog-{variant}"
     elif "haze" in desc:
-        return "haze-" + variant + ".svg", f"haze-{variant}"
+        return f"haze-{variant}.svg", f"haze-{variant}"
     elif "mist" in desc:
-        return "mist-" + variant + ".svg", f"mist-{variant}"
+        return f"mist-{variant}.svg", f"mist-{variant}"
     elif "wind" in desc:
-        return "wind-" + variant + ".svg", f"wind-{variant}"
+        return f"wind-{variant}.svg", f"wind-{variant}"
     else:
-        return "cloudy-" + variant + ".svg", f"cloudy-{variant}"
+        return f"cloudy-{variant}.svg", f"cloudy-{variant}"
 
 def get_weather(city):
-    BASE_URL = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}"
-    params = {"q": city, "appid": API_KEY}
+    GEO_URL = "http://api.openweathermap.org/geo/1.0/direct"
+    FORECAST_URL = "https://api.openweathermap.org/data/2.5/forecast"
+
     try:
-        response = requests.get(BASE_URL, params=params, timeout=10)
-        response.raise_for_status()
-        data = response.json()
+        geo_params = {"q": city, "limit": 1, "appid": API_KEY}
+        geo_response = requests.get(GEO_URL, params=geo_params, timeout=10)
+        geo_response.raise_for_status()
+        geo_data = geo_response.json()
 
-        cod = str(data.get("cod", ""))
-        if cod != "404":
-            main = data.get("main", {})
-            weather = data.get("weather", [{}])[0]
-            temperature_kelvin = main.get("temp")
-            temperature_celsius = round(temperature_kelvin - 273.15, 2) if temperature_kelvin else None
-            humidity = main.get("humidity")
-            description = weather.get("description", "").capitalize()
-            icon_code = weather.get("icon", "")
-            svg_icon, background_class = map_svg_icon(description, icon_code)
-
-            return {
-                "city": data.get("name"),
-                "temperature_celsius": temperature_celsius,
-                "humidity": humidity,
-                "description": description,
-                "icon_code": icon_code,
-                "svg_icon": svg_icon,
-                "background_class": background_class
-            }
-        else:
+        if not geo_data:
             return {"error": "City not found"}
+
+        lat = geo_data[0]["lat"]
+        lon = geo_data[0]["lon"]
+
+        forecast_params = {"lat": lat, "lon": lon, "appid": API_KEY, "units": "metric"}
+        forecast_response = requests.get(FORECAST_URL, params=forecast_params, timeout=10)
+        forecast_response.raise_for_status()
+        forecast_data = forecast_response.json()
+
+        current = forecast_data["list"][0]
+        description = current["weather"][0]["description"].capitalize()
+        icon_code = current["weather"][0]["icon"]
+        temperature_celsius = current["main"]["temp"]
+        humidity = current["main"]["humidity"]
+        svg_icon, background_class = map_svg_icon(description, icon_code)
+
+        hourly_forecast = []
+        for entry in forecast_data["list"][:8]:  # Next 24 hours (3-hour intervals)
+            time = entry["dt_txt"][11:16]  # Extract HH:MM
+            temp = entry["main"]["temp"]
+            hourly_forecast.append({
+                              "time": time,
+                              "temp": temp,
+                              "icon": entry["weather"][0]["icon"] + ".svg"  # or map to your custom SVG
+                            })
+
+        return {
+            "city": geo_data[0]["name"],
+            "temperature_celsius": temperature_celsius,
+            "humidity": humidity,
+            "description": description,
+            "icon_code": icon_code,
+            "svg_icon": svg_icon,
+            "background_class": background_class,
+            "hourly_forecast": hourly_forecast
+        }
+
     except requests.exceptions.RequestException as e:
         print(f"Request error: {e}")
         return {"error": "Network error occurred"}
-    
+
 @app.route('/', methods=['GET', 'POST'])
 def home():
     if request.method == 'POST':
