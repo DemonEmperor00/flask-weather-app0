@@ -6,7 +6,8 @@
   <title>Weather Results</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
+<body class="{{ weather.background_class }}">
+
   <header>
     <h1>Weather Results</h1>
   </header>
@@ -26,7 +27,6 @@
     <br />
     <a href="/"><button>Check Another City</button></a>
   </main>
-</body>
-</html>
+
 </body>
 </html>

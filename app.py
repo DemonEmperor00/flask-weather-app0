@@ -10,34 +10,35 @@ API_KEY = os.environ.get('WEATHER_API_KEY')
 def map_svg_icon(description, icon_code):
     desc = description.lower()
     is_night = icon_code.endswith('n')
+    variant = "night" if is_night else "day"
     
     if "clear" in desc:
-        return "clear-night.svg" if is_night else "clear-day.svg"
+        return "clear-" + variant + ".svg", f"clear-{variant}"
     elif "overcast cloud" in desc:
-        return "overcast-night.svg" if is_night else "overcast-day.svg"
+        return "overcast-" + variant + ".svg", f"overcast-{variant}"
     elif "cloud" in desc:
-        return "cloudy.svg" if is_night else "cloudy.svg"
+        return "cloudy-" + variant + ".svg", f"cloudy-{variant}"
     elif "drizzle" in desc:
-        return "drizzle.svg" if is_night else "drizzle.svg"
+        return "drizzle-" + variant + ".svg", f"drizzle-{variant}"
     elif "heavy intensity rain" in desc:
-        return "extreme-night-rain.svg" if is_night else "extreme-day-rain.svg"
+        return "extreme-" + variant + "-rain.svg", f"extreme-{variant}-rain"
     elif "rain" in desc:
-        return "rain.svg" if is_night else "rain.svg"
+        return "rain-" + variant + ".svg", f"rain-{variant}"
     elif "snow" in desc:
-        return "snow.svg" if is_night else "snow.svg"
+        return "snow-" + variant + ".svg", f"snow-{variant}"
     elif "thunder" in desc:
-        return "thunderstorms-night.svg" if is_night else "thunderstorms-day.svg"
+        return "thunderstorms-" + variant + ".svg", f"thunderstorms-{variant}"
     elif "fog" in desc:
-        return "fog-night.svg" if is_night else "fog.svg"
+        return "fog-" + variant + ".svg", f"fog-{variant}"
     elif "haze" in desc:
-        return "haze-night.svg" if is_night else "haze-day.svg"
+        return "haze-" + variant + ".svg", f"haze-{variant}"
     elif "mist" in desc:
-        return "mist.svg" if is_night else "mist.svg"
+        return "mist-" + variant + ".svg", f"mist-{variant}"
     elif "wind" in desc:
-        return "wind.svg" if is_night else "wind.svg"
+        return "wind-" + variant + ".svg", f"wind-{variant}"
     else:
-        return "cloudy.svg" if is_night else "cloudy.svg"
-    
+        return "cloudy-" + variant + ".svg", f"cloudy-{variant}"
+
 def get_weather(city):
     BASE_URL = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}"
     params = {"q": city, "appid": API_KEY}
@@ -55,7 +56,7 @@ def get_weather(city):
             humidity = main.get("humidity")
             description = weather.get("description", "").capitalize()
             icon_code = weather.get("icon", "")
-            svg_icon = map_svg_icon(description, icon_code)
+            svg_icon, background_class = map_svg_icon(description, icon_code)
 
             return {
                 "city": data.get("name"),
@@ -63,7 +64,8 @@ def get_weather(city):
                 "humidity": humidity,
                 "description": description,
                 "icon_code": icon_code,
-                "svg_icon": svg_icon
+                "svg_icon": svg_icon,
+                "background_class": background_class
             }
         else:
             return {"error": "City not found"}

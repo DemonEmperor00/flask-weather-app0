@@ -1,23 +1,90 @@
-/* Reset */
+/* 🌤️ Weather Background Variants */
+body.clear-day {
+  background: linear-gradient(to top, #87ceeb, #ffffff);
+}
+body.clear-night {
+  background: linear-gradient(to top, #0d1b2a, #1b263b);
+}
+body.rain-day {
+  background: linear-gradient(to top, #4e54c8, #8f94fb);
+}
+body.rain-night {
+  background: linear-gradient(to top, #1f1c2c, #928dab);
+}
+body.cloudy-day {
+  background: linear-gradient(to top, #d3d3d3, #f0f0f0);
+}
+body.cloudy-night {
+  background: linear-gradient(to top, #2c3e50, #34495e);
+}
+body.snow-day {
+  background: linear-gradient(to top, #e0f7fa, #ffffff);
+}
+body.snow-night {
+  background: linear-gradient(to top, #1c1c1c, #3a3a3a);
+}
+body.thunderstorms-day {
+  background: linear-gradient(to top, #616161, #9e9e9e);
+}
+body.thunderstorms-night {
+  background: linear-gradient(to top, #0f2027, #203a43);
+}
+body.mist-day,
+body.fog-day,
+body.haze-day {
+  background: linear-gradient(to top, #cfd8dc, #eceff1);
+}
+body.mist-night,
+body.fog-night,
+body.haze-night {
+  background: linear-gradient(to top, #37474f, #607d8b);
+}
+body.wind-day {
+  background: linear-gradient(to top, #b2fefa, #0ed2f7);
+}
+body.wind-night {
+  background: linear-gradient(to top, #1e3c72, #2a5298);
+}
+body.drizzle-day {
+  background: linear-gradient(to top, #89f7fe, #66a6ff);
+}
+body.drizzle-night {
+  background: linear-gradient(to top, #283e51, #485563);
+}
+body.extreme-day-rain {
+  background: linear-gradient(to top, #3a6073, #16222a);
+}
+body.extreme-night-rain {
+  background: linear-gradient(to top, #0f2027, #203a43);
+}
+body.overcast-day {
+  background: linear-gradient(to top, #b0bec5, #eceff1);
+}
+body.overcast-night {
+  background: linear-gradient(to top, #263238, #455a64);
+}
+
+/* 🧍 Base Reset */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* Body */
+/* 🧍 Body Styling */
 body {
+  background: linear-gradient(to top, #cbc0b8, #cca06d);
   font-family: 'Segoe UI', Tahoma, sans-serif;
-  background: linear-gradient(to top, #a0c4ff, #cdb4db);
   color: #fffefe;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 20px;
+  transition: background 1s ease-in-out;
 }
 
-/* Header */
+/* 🧢 Header */
 header {
   text-align: center;
   margin-bottom: 30px;
@@ -28,7 +95,7 @@ header h1 {
   color: #1d3557;
 }
 
-/* Main */
+/* 📦 Main Content */
 main {
   width: 100%;
   max-width: 500px;
@@ -36,8 +103,7 @@ main {
   color: #101011;
 }
 
-
-/* Form */
+/* 📝 Form Styling */
 form {
   margin-bottom: 20px;
 }
@@ -64,18 +130,19 @@ button:hover {
   background-color: #1d3557;
 }
 
-/* Weather Container */
+/* 🌡️ Weather Container */
 .weather-container {
-  background: transparent; /* Changed this line */
+  background: transparent;
   border-radius: 12px;
-  padding: 20px 30px; 
-}   
+  padding: 20px 30px;
+}
 
-/* Weather Icon */
+/* 🌈 Weather Icon Animation */
 .animated-icon {
   width: 120px;
   animation: float 3s ease-in-out infinite;
   margin: 15px 0;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
 }
 
 @keyframes float {
@@ -87,13 +154,23 @@ button:hover {
   }
 }
 
-/* Error */
+/* ✨ Fade-in Effect */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+img.weather-icon {
+  animation: fadeIn 1s ease-in;
+}
+
+/* ❗ Error Message */
 .error {
   color: red;
   margin-top: 10px;
 }
 
-/* Responsive */
+/* 📱 Responsive Design */
 @media (max-width: 600px) {
   input[type="text"] {
     width: 60%;
